@@ -10,14 +10,19 @@ export const scanFile = (file: string, key: string): boolean => {
 
 export const scanFolder = (folder: string, key: string, exclude?: Array<string>): boolean => {
     let found = false
-    
+
     const readDir = fs.readdirSync(folder)
-    for(let filename of readDir) {
-        if (exclude && exclude.includes(filename)) break
-        const file = path.resolve(folder, filename)
-        const { isDirectory, isFile } = fs.statSync(file)
-        if (isDirectory())  found = scanFolder(file, key)
-        if (isFile()) found = scanFile(file, key)
+    for (let filename of readDir) {
+        if (!exclude || !exclude.includes(filename)) {
+            const file = path.resolve(folder, filename)
+            console.log(file)
+            const stats = fs.statSync(file)
+            if (stats.isFile()) found = scanFile(file, key)
+            if (stats.isDirectory()) found = scanFolder(file, key, exclude)
+            if (found) {
+                break
+            }
+        }
     }
 
     return found
