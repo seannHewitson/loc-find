@@ -4,7 +4,9 @@ import { scanFolder } from './scanner'
 
 const found = {
     api: 0,
-    ui: 0
+    ui: 0,
+    ad: 0,
+    legacy: 0,
 }
 
 const keys = fs.readFileSync(
@@ -12,23 +14,29 @@ const keys = fs.readFileSync(
 ).toString().split('\r\n').map((key: string) => ({
     key,
     api: false,
-    ui: false
+    ui: false,
+    ad: false,
+    legacy: false,
 }))
 
 const root = path.resolve(__dirname, '../',)
-const exclude = ['node_modules', '.git', 'lokalise-tmp', 'images', 'mosaico']
+const exclude = ['node_modules', '.git', 'web', 'lokalise-tmp', 'images', 'mosaico', 'vendor', 'storage']
 
 const results = keys.map(({ key }: any) => {
-    const api = scanFolder(path.resolve(root, 'Platform-API'), key, [...exclude, 'vendor', 'storage'])
+    const api = scanFolder(path.resolve(root, 'Platform-API'), key, exclude)
     const ui = scanFolder(path.resolve(root, 'Platform-UI-Prototype'), key, exclude)
+    const ad = scanFolder(path.resolve(root, 'ui'), key, exclude)
+    const legacy = scanFolder(path.resolve(root, 'old-platform'), key, exclude)
     found.api += Number(api)
     found.ui += Number(ui)
-    return { key, api, ui }
+    found.ad += Number(ad)
+    found.legacy += Number(legacy)
+    return { key, api, ui, ad, legacy }
 })
 
 let output: string = ''
-results.forEach(({ key, api, ui }: any) => {
-    output += `${key},${api},${ui}\r\n`
+results.forEach(({ key, api, ui, ad, legacy }: any) => {
+    output += `${key},${api},${ui},${ad},${legacy}\r\n`
 })
 
 fs.writeFileSync(
@@ -39,3 +47,5 @@ fs.writeFileSync(
 
 console.log(`Found api: ${found.api}`)
 console.log(`Found ui: ${found.ui}`)
+console.log(`Found ad: ${found.ad}`)
+console.log(`Found legacy: ${found.legacy}`)
