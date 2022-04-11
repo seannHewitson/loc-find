@@ -8,7 +8,7 @@ const file = fs.readFileSync(
 ).toString().split('\n')
 
 const fileKeys: Array<any> = file.map((key: string) => ({
-    key: splitter(key, '_'),
+    key: splitter(key),
     found: false
 }))
 
