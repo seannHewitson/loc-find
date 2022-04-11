@@ -3,9 +3,8 @@ import path from 'path'
 
 export const scanFile = (file: string, key: string): boolean => {
     const expr = new RegExp(key, 'g')
-    const expr1 = new RegExp(key.replace(/::/g, '.'), 'g')
     const contents = fs.readFileSync(file, { encoding: 'utf-8', flag: 'r' }).toString()
-    return expr.test(contents) || expr1.test(contents)
+    return expr.test(contents)
 }
 
 const exclude: Array<string> = [
